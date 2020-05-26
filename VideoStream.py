@@ -16,3 +16,13 @@ class VideoStream:
 
     def stop(self):
         self.stopped = True
+
+    def update(self):
+        for f in self.stream:
+            self.frame = f.array
+            self.rawCapture.truncate(0)
+
+            if self.stopped:
+                self.stream.close()
+                self.rawCapture.close()
+                self.camera.close()
