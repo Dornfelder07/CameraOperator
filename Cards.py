@@ -15,3 +15,6 @@ CARD_MIN_AREA = 25000
 
 font = cv2.FONT_HERSHEY_SIMPLEX
 
+class Query_card:
+    def __init__(self):
+        self.width, self.height = 0, 0  # wxh karty
