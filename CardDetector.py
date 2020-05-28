@@ -12,7 +12,7 @@ freq = cv2.getTickFrequency()
 font = cv2.FONT_HERSHEY_SIMPLEX
 
 videostream = VideoStream.VideoStream((IM_WIDTH, IM_HEIGHT), FRAME_RATE, 2,
-                                      'http://192.168.0.153:4747/video?640x480').start()
+                                      'localhost').start()
 time.sleep(1)
 
 path = os.path.dirname(os.path.abspath(__file__))
