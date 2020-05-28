@@ -17,28 +17,28 @@ font = cv2.FONT_HERSHEY_SIMPLEX
 
 class Query_card:
     def __init__(self):
-        self.contour = []  # Contour of card
-        self.width, self.height = 0, 0  # Width and height of card
-        self.corner_pts = []  # Corner points of card
-        self.center = []  # Center point of card
-        self.warp = []  # 200x300, flattened, grayed, blurred image
-        self.rank_img = []  # Thresholded, sized image of card's rank
-        self.suit_img = []  # Thresholded, sized image of card's suit
-        self.best_rank_match = "Unknown"  # Best matched rank
-        self.best_suit_match = "Unknown"  # Best matched suit
-        self.rank_diff = 0  # Difference between rank image and best matched train rank image
-        self.suit_diff = 0  # Difference between suit image and best matched train suit image
+        self.contour = []
+        self.width, self.height = 0, 0
+        self.corner_pts = []
+        self.center = []
+        self.warp = []
+        self.rank_img = []
+        self.suit_img = []
+        self.best_rank_match = "Unknown"
+        self.best_suit_match = "Unknown"
+        self.rank_diff = 0
+        self.suit_diff = 0
 
 
 class Train_ranks:
     def __init__(self):
-        self.img = []  # Thresholded, sized rank image loaded from hard drive
+        self.img = []
         self.name = "Placeholder"
 
 
 class Train_suits:
     def __init__(self):
-        self.img = []  # Thresholded, sized suit image loaded from hard drive
+        self.img = []
         self.name = "Placeholder"
 
 def load_ranks(filepath):
