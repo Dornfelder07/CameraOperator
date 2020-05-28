@@ -2,8 +2,19 @@ import cv2
 from threading import Thread
 
 class VideoStream:
-    def __init__(self, resolution=(640,480),framerate=10,PiOrUSB=1,src=0):
-        self.PiOrUSB = PiOrUSB
+    def __init__(self, resolution=(640,480),framerate=10,src=0):
+        from picamera.array import PiRGBArray
+        from picamera import PiCamera
+
+        # Initialize the PiCamera and the camera image stream
+        self.camera = PiCamera()
+        self.camera.resolution = resolution
+        self.camera.framerate = framerate
+        self.rawCapture = PiRGBArray(self.camera, size=resolution)
+        self.stream = self.camera.capture_continuous(
+            self.rawCapture, format="bgr", use_video_port=True)
+
+        self.frame = []
         self.stopped = False
 
     def start(self):
