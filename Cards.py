@@ -81,3 +81,20 @@ def preprocess_image(image):
     retval, thresh = cv2.threshold(blur, thresh_level, 255, cv2.THRESH_BINARY)
 
     return thresh
+
+def find_cards(thresh_image):
+    dummy, cnts, hier = cv2.findContours(thresh_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    index_sort = sorted(range(len(cnts)), key=lambda i: cv2.contourArea(cnts[i]), reverse=True)
+
+    if len(cnts) == 0:
+        return [], []
+
+    cnts_sort = []
+    hier_sort = []
+    cnt_is_card = np.zeros(len(cnts), dtype=int)
+
+    for i in index_sort:
+        cnts_sort.append(cnts[i])
+        hier_sort.append(hier[0][i])
+
+    return 0
