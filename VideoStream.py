@@ -1,4 +1,3 @@
-import cv2
 from threading import Thread
 from picamera.array import PiRGBArray
 from picamera import PiCamera

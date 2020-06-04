@@ -17,10 +17,8 @@ time.sleep(1)
 
 path = os.path.dirname(os.path.abspath(__file__))
 
-
 def most_frequent(List):
     return max(set(List), key=List.count)
-
 
 cam_quit = 0
 while cam_quit == 0:
