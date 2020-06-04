@@ -2,6 +2,7 @@ import cv2
 import time
 import os
 import VideoStream
+import Cards
 
 IM_WIDTH = 1280
 IM_HEIGHT = 720
@@ -22,4 +23,13 @@ def most_frequent(List):
 
 cam_quit = 0
 while cam_quit == 0:
+    image = videostream.read()
+    t1 = cv2.getTickCount()
+    pre_proc = Cards.preprocess_image(image)
+    cnts_sort, cnt_is_card = Cards.find_cards(pre_proc)
+
+
     break
+
+cv2.destroyAllWindows()
+videostream.stop()
