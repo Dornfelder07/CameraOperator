@@ -79,7 +79,6 @@ def preprocess_image(image):
 
     return thresh
 
-
 def flattener(image, pts, w, h):
     """Flattens an image of a card into a top-down 200x300 perspective.
     Returns the flattened, re-sized, grayed image.
@@ -148,7 +147,21 @@ def flattener(image, pts, w, h):
 
     return warp
 
-def preprocess_card():
+def preprocess_card(contour, image):
+    qCard = Query_card()
+
+    qCard.contour = contour
+
+    # Find perimeter of card and use it to approximate corner points
+    peri = cv2.arcLength(contour, True)
+    approx = cv2.approxPolyDP(contour, 0.01 * peri, True)
+    pts = np.float32(approx)
+    qCard.corner_pts = pts
+
+    # Find width and height of card's bounding rectangle
+    x, y, w, h = cv2.boundingRect(contour)
+    qCard.width, qCard.height = w, h
+    
     return 0
 
 def find_cards(thresh_image):
