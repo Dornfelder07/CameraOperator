@@ -18,18 +18,20 @@ videostream = VideoStream.VideoStream((IM_WIDTH, IM_HEIGHT), FRAME_RATE, 2,
 time.sleep(1)
 
 path = os.path.dirname(os.path.abspath(__file__))
-train_ranks = Cards.load_ranks( path + '/CardsImg/')
-train_suits = Cards.load_suits( path + '/CardsImg/')
+train_ranks = Cards.load_ranks(path + '/CardsImg/')
+train_suits = Cards.load_suits(path + '/CardsImg/')
+
 
 def most_frequent(List):
     return max(set(List), key=List.count)
+
 
 last_card = []
 cards_history = []
 cam_quit = 0
 while cam_quit == 0:
     image = videostream.read()
-    t1 =cv2.getTickCount()
+    t1 = cv2.getTickCount()
     pre_proc = Cards.preprocess_image(image)
     cnts_sort, cnt_is_card = Cards.find_cards(pre_proc)
 
@@ -38,27 +40,51 @@ while cam_quit == 0:
         k = 0
 
         for i in range(len(cnts_sort)):
-            if (cnt_is_card[i] == 1):
-                cards.append(Cards.preprocess_card(cnts_sort[i],image))
-                cards[k].best_rank_match,cards[k].best_suit_match,cards[k].rank_diff,cards[k].suit_diff = Cards.match_card(cards[k],train_ranks,train_suits)
+            if cnt_is_card[i] == 1:
+                cards.append(Cards.preprocess_card(cnts_sort[i], image))
+                cards[k].best_rank_match, cards[k].best_suit_match, cards[k].rank_diff, cards[
+                    k].suit_diff = Cards.match_card(cards[k], train_ranks, train_suits)
 
                 # Draw center point and match result on the image.
                 image = Cards.draw_results(image, cards[k])
-                if(cards[k].best_rank_match != "Unknown" and cards[k].best_suit_match != "Unknown"):
-                    #print(cards[k].best_rank_match, cards[k].best_suit_match)
-                    if(len(cards_history)!=0):
-                        if(cards_history[len(cards_history) - 1] != (cards[k].best_rank_match + " " + cards[k].best_suit_match)):
+                if cards[k].best_rank_match != "Unknown" and cards[k].best_suit_match != "Unknown":
+                    # print(cards[k].best_rank_match, cards[k].best_suit_match)
+                    if len(cards_history) != 0:
+                        if cards_history[len(cards_history) - 1] != (
+                                cards[k].best_rank_match + " " + cards[k].best_suit_match):
                             last_card.append(cards[k].best_rank_match + " " + cards[k].best_suit_match)
                     else:
                         last_card.append(cards[k].best_rank_match + " " + cards[k].best_suit_match)
-                    #print(last_card)
+                    # print(last_card)
                 k = k + 1
-                if(len(last_card)==200):
+                if len(last_card) == 200:
                     cards_history.append(most_frequent(last_card))
-                    r = requests.get(url='http://192.168.0.180:8080/test/pyConnectTest?card='+most_frequent(last_card))
+                    r = requests.get(
+                        url='http://192.168.0.180:8080/test/pyConnectTest?card=' + most_frequent(last_card))
                     data = r.json()
                     print("CARDS HISTORY", str(cards_history))
-                    last_card=[]
+                    last_card = []
+
+        if len(cards) != 0:
+            temp_cnts = []
+            for i in range(len(cards)):
+                temp_cnts.append(cards[i].contour)
+            cv2.drawContours(image, temp_cnts, -1, (255, 0, 0), 2)
+
+
+    # Draw framerate in the corner of the image. Framerate is calculated at the end of the main loop,
+    # so the first time this runs, framerate will be shown as 0.
+    cv2.putText(image, "FPS: "+str(int(frame_rate_calc)),(10,26),font,0.7,(255,0,255),2,cv2.LINE_AA)
+    # Finally, display the image with the identified cards!
+    cv2.imshow("Card Detector", image)
+    # Calculate framerate
+    t2 = cv2.getTickCount()
+    time1 = (t2-t1)/freq
+    frame_rate_calc = 1/time1
+    # Poll the keyboard. If 'q' is pressed, exit the main loop.
+    key = cv2.waitKey(1) & 0xFF
+    if key == ord("q"):
+        cam_quit = 1
 
 cv2.destroyAllWindows()
 videostream.stop()
