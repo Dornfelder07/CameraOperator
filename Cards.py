@@ -161,8 +161,19 @@ def preprocess_card(contour, image):
     # Find width and height of card's bounding rectangle
     x, y, w, h = cv2.boundingRect(contour)
     qCard.width, qCard.height = w, h
-    
-    return 0
+
+    # Find center point of card by taking x and y average of the four corners.
+    average = np.sum(pts, axis=0) / len(pts)
+    cent_x = int(average[0][0])
+    cent_y = int(average[0][1])
+    qCard.center = [cent_x, cent_y]
+
+    # Warp card into 200x300 flattened image using perspective transform
+    qCard.warp = flattener(image, pts, w, h)
+
+    # Grab corner of warped card image and do a 4x zoom
+    Qcorner = qCard.warp[0:CORNER_HEIGHT, 0:CORNER_WIDTH]
+    Qcorner_zoom = cv2.resize(Qcorner, (0, 0), fx=4, fy=4)
 
 def find_cards(thresh_image):
     dummy, cnts, hier = cv2.findContours(thresh_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
