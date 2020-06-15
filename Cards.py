@@ -190,6 +190,21 @@ def preprocess_card(contour, image):
     dummy, Qrank_cnts, hier = cv2.findContours(Qrank, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
     Qrank_cnts = sorted(Qrank_cnts, key=cv2.contourArea, reverse=True)
 
+    if len(Qrank_cnts) != 0:
+        x1, y1, w1, h1 = cv2.boundingRect(Qrank_cnts[0])
+        Qrank_roi = Qrank[y1:y1 + h1, x1:x1 + w1]
+        Qrank_sized = cv2.resize(Qrank_roi, (RANK_WIDTH, RANK_HEIGHT), 0, 0)
+        qCard.rank_img = Qrank_sized
+
+    dummy, Qsuit_cnts, hier = cv2.findContours(Qsuit, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
+    Qsuit_cnts = sorted(Qsuit_cnts, key=cv2.contourArea, reverse=True)
+
+    if len(Qsuit_cnts) != 0:
+        x2, y2, w2, h2 = cv2.boundingRect(Qsuit_cnts[0])
+        Qsuit_roi = Qsuit[y2:y2 + h2, x2:x2 + w2]
+        Qsuit_sized = cv2.resize(Qsuit_roi, (SUIT_WIDTH, SUIT_HEIGHT), 0, 0)
+        qCard.suit_img = Qsuit_sized
+
     return qCard
 
 def find_cards(thresh_image):
