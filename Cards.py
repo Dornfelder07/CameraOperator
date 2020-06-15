@@ -1,4 +1,5 @@
 import cv2
+import numpy as np
 
 BKG_THRESH = 60
 CARD_THRESH = 30
@@ -29,12 +30,10 @@ class Query_card:
         self.rank_diff = 0
         self.suit_diff = 0
 
-
 class Train_ranks:
     def __init__(self):
         self.img = []
         self.name = "Placeholder"
-
 
 class Train_suits:
     def __init__(self):
@@ -69,8 +68,6 @@ def load_suits(filepath):
     return train_suits
 
 def preprocess_image(image):
-    """Returns a grayed, blurred, and adaptively thresholded camera image."""
-
     gray = cv2.cvtColor(image, cv2.COLOR_BGR2GRAY)
     blur = cv2.GaussianBlur(gray, (5, 5), 0)
 
@@ -81,6 +78,9 @@ def preprocess_image(image):
     retval, thresh = cv2.threshold(blur, thresh_level, 255, cv2.THRESH_BINARY)
 
     return thresh
+
+def preprocess_card():
+    return 0
 
 def find_cards(thresh_image):
     dummy, cnts, hier = cv2.findContours(thresh_image, cv2.RETR_TREE, cv2.CHAIN_APPROX_SIMPLE)
@@ -93,8 +93,13 @@ def find_cards(thresh_image):
     hier_sort = []
     cnt_is_card = np.zeros(len(cnts), dtype=int)
 
-    for i in index_sort:
-        cnts_sort.append(cnts[i])
-        hier_sort.append(hier[0][i])
+    for i in range(len(cnts_sort)):
+        size = cv2.contourArea(cnts_sort[i])
+        peri = cv2.arcLength(cnts_sort[i], True)
+        approx = cv2.approxPolyDP(cnts_sort[i], 0.01 * peri, True)
 
-    return 0
+        if ((size < CARD_MAX_AREA) and (size > CARD_MIN_AREA)
+                and (hier_sort[i][3] == -1) and (len(approx) == 4)):
+            cnt_is_card[i] = 1
+
+    return cnts_sort, cnt_is_card
